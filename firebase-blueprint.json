@@ -1,0 +1,58 @@
+{
+  "entities": {
+    "classes": {
+      "title": "Taekwondo Class",
+      "description": "A class offered by the Taekwondo club",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Name of the class" },
+        "ageRange": { "type": "string", "description": "Target age group (e.g., 5-10 years)" },
+        "schedule": { "type": "string", "description": "Class timing (e.g., Mon/Wed 5PM)" },
+        "location": { "type": "string", "description": "Where the class is held" },
+        "description": { "type": "string", "description": "Detailed description of the class" },
+        "imageUrl": { "type": "string", "format": "uri", "description": "Image representing the class" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the class was created" }
+      },
+      "required": ["title", "ageRange", "schedule", "location"]
+    },
+    "registrations": {
+      "title": "Class Registration",
+      "description": "A student registration for a specific class",
+      "type": "object",
+      "properties": {
+        "studentName": { "type": "string" },
+        "parentName": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "classId": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["studentName", "phone", "classId"]
+    },
+    "users": {
+      "title": "User Profile",
+      "description": "User account information",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["admin", "user"] }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/classes/{classId}": {
+      "schema": "classes",
+      "description": "Collection of Taekwondo classes"
+    },
+    "/registrations/{regId}": {
+      "schema": "registrations",
+      "description": "Student registrations"
+    },
+    "/users/{userId}": {
+      "schema": "users",
+      "description": "User profiles and roles"
+    }
+  }
+}

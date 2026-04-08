@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: classes
+    // Fields: title (string), ageRange (string), schedule (string), location (string), description (string), imageUrl (string), createdAt (timestamp)
+    //
+    // Collection: registrations
+    // Fields: studentName (string), parentName (string), phone (string), email (string), classId (string), status (string), createdAt (timestamp)
+    //
+    // Collection: trainers
+    // Fields: name (string), rank (string), imageUrl (string), description (string), createdAt (timestamp)
+    //
+    // Collection: users
+    // Fields: email (string), role (string)
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' || 
+         request.auth.token.email == "ngochoang.itqt@gmail.com");
+    }
+
+    function isValidClass(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() < 100 &&
+             data.ageRange is string && data.ageRange.size() < 50 &&
+             data.schedule is string && data.schedule.size() < 100 &&
+             data.location is string && data.location.size() < 200;
+    }
+
+    function isValidRegistration(data) {
+      return data.studentName is string && data.studentName.size() > 0 && data.studentName.size() < 100 &&
+             data.phone is string && data.phone.size() >= 8 && data.phone.size() <= 15 &&
+             data.classId is string;
+    }
+
+    // Rules
+    match /classes/{classId} {
+      allow read: if true; // Publicly readable
+      allow create, update, delete: if isAdmin() && isValidClass(request.resource.data);
+    }
+
+    match /trainers/{trainerId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /registrations/{regId} {
+      allow read: if isAdmin();
+      allow create: if isValidRegistration(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin();
+    }
+  }
+}
