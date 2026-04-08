@@ -14,7 +14,7 @@ export default function Hero() {
   const opacity = useTransform(scrollYProgress, [0, 1], [0.4, 0]);
 
   return (
-    <section ref={containerRef} className="relative min-h-[90vh] flex items-center overflow-hidden bg-black">
+    <section ref={containerRef} className="relative min-h-[90vh] flex items-center overflow-hidden bg-bg-deep">
       {/* Background Image with Overlay */}
       <motion.div style={{ y, opacity }} className="absolute inset-0 z-0">
         <img 
@@ -23,7 +23,7 @@ export default function Hero() {
           className="w-full h-full object-cover"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-bg-deep via-bg-deep/80 to-transparent" />
       </motion.div>
 
       {/* Floating Elements */}

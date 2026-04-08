@@ -50,7 +50,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-[#0d6efd]">
+      <div className="h-screen w-full flex items-center justify-center bg-primary">
         <motion.div 
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
@@ -61,7 +61,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0a0a0a] cursor-none">
+    <div className="min-h-screen flex flex-col bg-bg-deep cursor-none">
       <motion.div
         className="fixed top-0 left-0 right-0 h-1 bg-primary z-[100] origin-left"
         style={{ scaleX }}
@@ -94,7 +94,7 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="py-32 bg-[#0a0a0a] relative overflow-hidden"
+                className="py-32 bg-bg-deep relative overflow-hidden"
               >
                 <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 <div className="container mx-auto px-4">
@@ -118,7 +118,7 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="py-32 bg-[#111] relative"
+                className="py-32 bg-bg-card relative"
               >
                 <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-20 items-center">
                   <div className="relative group">
@@ -169,7 +169,7 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="py-32 bg-[#0a0a0a]"
+                className="py-32 bg-bg-deep"
               >
                 <div className="container mx-auto px-4">
                   <div className="text-center mb-24">
@@ -211,7 +211,7 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="py-32 bg-[#111]"
+                className="py-32 bg-bg-card"
               >
                 <div className="container mx-auto px-4">
                   <div className="flex items-center justify-between mb-16">

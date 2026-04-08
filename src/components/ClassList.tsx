@@ -41,7 +41,7 @@ export default function ClassList() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1, duration: 0.5 }}
-            className="group relative bg-[#1a1a1a] rounded-sm overflow-hidden border border-white/5 hover:border-primary/50 transition-all duration-500"
+            className="group relative bg-bg-card rounded-sm overflow-hidden border border-white/5 hover:border-primary/50 transition-all duration-500"
           >
             {/* Image Container */}
             <div className="relative h-72 overflow-hidden">
@@ -51,7 +51,7 @@ export default function ClassList() {
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent opacity-80" />
+              <div className="absolute inset-0 bg-gradient-to-t from-bg-card via-transparent to-transparent opacity-80" />
               
               <div className="absolute top-6 left-6">
                 <span className="px-4 py-1 bg-primary text-white text-[10px] font-black uppercase tracking-widest skew-x-negative inline-block">

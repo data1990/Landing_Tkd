@@ -1,8 +1,26 @@
+import React, { useState, useEffect } from 'react';
 import { Facebook, Instagram, Youtube, MapPin, Phone, Mail } from 'lucide-react';
+import { db } from '../lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 export default function Footer() {
+  const [settings, setSettings] = useState({
+    address: '123 Đường Võ Thuật, Quận 1, TP. HCM',
+    phone: '090 123 4567',
+    email: 'contact@clbtaekwondo.vn'
+  });
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'settings', 'contact'), (snap) => {
+      if (snap.exists()) {
+        setSettings(snap.data() as any);
+      }
+    });
+    return () => unsub();
+  }, []);
+
   return (
-    <footer id="liên-hệ" className="bg-black text-white pt-32 pb-12 relative overflow-hidden">
+    <footer id="liên-hệ" className="bg-bg-deep text-white pt-32 pb-12 relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
       
       <div className="container mx-auto px-4">
@@ -51,7 +69,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">Địa chỉ</p>
-                  <p className="text-white/80 font-bold">123 Đường Võ Thuật, Quận 1, TP. HCM</p>
+                  <p className="text-white/80 font-bold">{settings.address}</p>
                 </div>
               </li>
               <li className="flex gap-6 group">
@@ -60,7 +78,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">Điện thoại</p>
-                  <p className="text-white/80 font-bold">090 123 4567</p>
+                  <p className="text-white/80 font-bold">{settings.phone}</p>
                 </div>
               </li>
               <li className="flex gap-6 group">
@@ -69,7 +87,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">Email</p>
-                  <p className="text-white/80 font-bold">contact@clbtaekwondo.vn</p>
+                  <p className="text-white/80 font-bold">{settings.email}</p>
                 </div>
               </li>
             </ul>

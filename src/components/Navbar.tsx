@@ -26,7 +26,7 @@ export default function Navbar({ user, isAdmin, onSignIn, onLogout, onToggleView
   }, []);
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-black/90 backdrop-blur-xl border-b border-white/10 py-2' : 'bg-transparent border-b border-transparent py-4'}`}>
+    <nav className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-bg-deep/90 backdrop-blur-xl border-b border-white/10 py-2' : 'bg-transparent border-b border-transparent py-4'}`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <Magnetic>
@@ -103,7 +103,7 @@ export default function Navbar({ user, isAdmin, onSignIn, onLogout, onToggleView
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-black border-b border-white/10 overflow-hidden"
+            className="md:hidden bg-bg-deep border-b border-white/10 overflow-hidden"
           >
             <div className="p-6 space-y-6">
               {['Trang chủ', 'Lớp học', 'Huấn luyện viên', 'Liên hệ'].map((item) => (

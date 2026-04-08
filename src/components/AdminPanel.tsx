@@ -2,13 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, onSnapshot, query, orderBy, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { motion } from 'framer-motion';
-import { Plus, Trash2, Edit2, Users, BookOpen, Save, X, ShieldCheck } from 'lucide-react';
+import { Plus, Trash2, Edit2, Users, BookOpen, Save, X, ShieldCheck, Settings } from 'lucide-react';
+import { setDoc } from 'firebase/firestore';
 
 export default function AdminPanel() {
-  const [activeTab, setActiveTab] = useState<'classes' | 'registrations' | 'trainers'>('classes');
+  const [activeTab, setActiveTab] = useState<'classes' | 'registrations' | 'trainers' | 'settings'>('classes');
   const [classes, setClasses] = useState<any[]>([]);
   const [registrations, setRegistrations] = useState<any[]>([]);
   const [trainers, setTrainers] = useState<any[]>([]);
+  const [settings, setSettings] = useState({
+    address: '123 Đường Võ Thuật, Quận 1, TP. HCM',
+    phone: '090 123 4567',
+    email: 'contact@taekwondoclub.vn'
+  });
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: '',
@@ -41,8 +47,27 @@ export default function AdminPanel() {
       setTrainers(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
 
-    return () => { unsubClasses(); unsubRegs(); unsubTrainers(); };
+    const unsubSettings = onSnapshot(doc(db, 'settings', 'contact'), (snap) => {
+      if (snap.exists()) {
+        setSettings(snap.data() as any);
+      }
+    });
+
+    return () => { unsubClasses(); unsubRegs(); unsubTrainers(); unsubSettings(); };
   }, []);
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await setDoc(doc(db, 'settings', 'contact'), {
+        ...settings,
+        updatedAt: serverTimestamp()
+      });
+      alert('Đã cập nhật thông tin liên hệ thành công!');
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, 'settings/contact');
+    }
+  };
 
   const handleSaveClass = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,13 +158,19 @@ export default function AdminPanel() {
           >
             <Users size={18} /> Đăng ký
           </button>
+          <button 
+            onClick={() => setActiveTab('settings')}
+            className={`w-full flex items-center gap-4 px-8 py-5 rounded-sm font-black uppercase tracking-widest text-xs transition-all ${activeTab === 'settings' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
+          >
+            <Settings size={18} /> Cấu hình thông tin
+          </button>
         </div>
 
         {/* Content */}
         <div className="flex-grow">
           {activeTab === 'classes' ? (
             <div className="space-y-12">
-              <div className="bg-[#1a1a1a] p-10 rounded-sm border border-white/10 shadow-2xl">
+              <div className="bg-bg-card p-10 rounded-sm border border-white/10 shadow-2xl">
                 <h3 className="text-2xl mb-8 flex items-center gap-3 italic">
                   {isEditing ? <Edit2 size={24} className="text-primary" /> : <Plus size={24} className="text-primary" />}
                   {isEditing ? 'CẬP NHẬT LỚP TẬP & LỊCH HỌC' : 'THÊM LỚP TẬP MỚI'}
@@ -229,7 +260,7 @@ export default function AdminPanel() {
               <div className="grid gap-6">
                 <h3 className="text-xl italic text-white/60 uppercase tracking-widest">DANH SÁCH LỚP TẬP & THỜI KHÓA BIỂU</h3>
                 {classes.map(cls => (
-                  <div key={cls.id} className="bg-[#1a1a1a] p-8 rounded-sm border border-white/5 flex items-center justify-between group hover:border-primary/30 transition-all">
+                  <div key={cls.id} className="bg-bg-card p-8 rounded-sm border border-white/5 flex items-center justify-between group hover:border-primary/30 transition-all">
                     <div>
                       <h4 className="text-2xl italic mb-2 group-hover:text-primary transition-colors">{cls.title}</h4>
                       <div className="flex flex-wrap gap-4">
@@ -254,7 +285,7 @@ export default function AdminPanel() {
                             imageUrl: cls.imageUrl || ''
                           });
                         }}
-                        className="w-12 h-12 flex items-center justify-center text-blue-400 hover:bg-blue-400/10 rounded-sm transition-all"
+                        className="w-12 h-12 flex items-center justify-center text-primary hover:bg-primary/10 rounded-sm transition-all"
                       >
                         <Edit2 size={20} />
                       </button>
@@ -271,7 +302,7 @@ export default function AdminPanel() {
             </div>
           ) : activeTab === 'trainers' ? (
             <div className="space-y-12">
-              <div className="bg-[#1a1a1a] p-10 rounded-sm border border-white/10 shadow-2xl">
+              <div className="bg-bg-card p-10 rounded-sm border border-white/10 shadow-2xl">
                 <h3 className="text-2xl mb-8 flex items-center gap-3 italic">
                   {isEditing ? <Edit2 size={24} className="text-primary" /> : <Plus size={24} className="text-primary" />}
                   {isEditing ? 'CẬP NHẬT HUẤN LUYỆN VIÊN' : 'THÊM HUẤN LUYỆN VIÊN'}
@@ -338,7 +369,7 @@ export default function AdminPanel() {
 
               <div className="grid gap-6">
                 {trainers.map(trainer => (
-                  <div key={trainer.id} className="bg-[#1a1a1a] p-8 rounded-sm border border-white/5 flex items-center justify-between group hover:border-primary/30 transition-all">
+                  <div key={trainer.id} className="bg-bg-card p-8 rounded-sm border border-white/5 flex items-center justify-between group hover:border-primary/30 transition-all">
                     <div className="flex items-center gap-6">
                       <img src={trainer.imageUrl || 'https://picsum.photos/seed/trainer/200'} alt="" className="w-16 h-16 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" />
                       <div>
@@ -357,7 +388,7 @@ export default function AdminPanel() {
                             description: trainer.description || ''
                           });
                         }}
-                        className="w-12 h-12 flex items-center justify-center text-blue-400 hover:bg-blue-400/10 rounded-sm transition-all"
+                        className="w-12 h-12 flex items-center justify-center text-primary hover:bg-primary/10 rounded-sm transition-all"
                       >
                         <Edit2 size={20} />
                       </button>
@@ -372,8 +403,64 @@ export default function AdminPanel() {
                 ))}
               </div>
             </div>
+          ) : activeTab === 'settings' ? (
+            <div className="space-y-12">
+              <div className="bg-bg-card p-10 rounded-sm border border-white/10 shadow-2xl">
+                <h3 className="text-2xl mb-8 flex items-center gap-3 italic">
+                  <Settings size={24} className="text-primary" />
+                  CẤU HÌNH THÔNG TIN LIÊN HỆ
+                </h3>
+                <form onSubmit={handleSaveSettings} className="space-y-8">
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Địa chỉ CLB</label>
+                        <input 
+                          required
+                          className="w-full bg-white/5 border border-white/10 px-5 py-4 rounded-sm text-white outline-none focus:border-primary transition-all"
+                          value={settings.address}
+                          onChange={e => setSettings({...settings, address: e.target.value})}
+                          placeholder="VD: 123 Đường Võ Thuật, Quận 1..."
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Số điện thoại</label>
+                        <input 
+                          required
+                          className="w-full bg-white/5 border border-white/10 px-5 py-4 rounded-sm text-white outline-none focus:border-primary transition-all"
+                          value={settings.phone}
+                          onChange={e => setSettings({...settings, phone: e.target.value})}
+                          placeholder="VD: 090 123 4567"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Email liên hệ</label>
+                        <input 
+                          required
+                          type="email"
+                          className="w-full bg-white/5 border border-white/10 px-5 py-4 rounded-sm text-white outline-none focus:border-primary transition-all"
+                          value={settings.email}
+                          onChange={e => setSettings({...settings, email: e.target.value})}
+                          placeholder="VD: contact@taekwondoclub.vn"
+                        />
+                      </div>
+                      <div className="pt-6">
+                        <p className="text-xs text-white/40 italic">
+                          * Thông tin này sẽ được hiển thị ở phần chân trang (Footer) và các thông tin liên hệ trên toàn website.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <button type="submit" className="w-full py-5 bg-primary text-white font-black uppercase tracking-widest text-sm rounded-sm flex items-center justify-center gap-3 hover:bg-primary-dark transition-all shadow-xl shadow-primary/20">
+                    <Save size={20} /> LƯU CẤU HÌNH
+                  </button>
+                </form>
+              </div>
+            </div>
           ) : (
-            <div className="bg-[#1a1a1a] rounded-sm border border-white/10 shadow-2xl overflow-hidden">
+            <div className="bg-bg-card rounded-sm border border-white/10 shadow-2xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead className="bg-white/5 border-b border-white/10">
