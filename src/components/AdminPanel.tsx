@@ -14,6 +14,7 @@ export default function AdminPanel() {
     address: '123 Đường Võ Thuật, Quận 1, TP. HCM',
     phone: '090 123 4567',
     email: 'contact@taekwondoclub.vn',
+    siteTitle: 'CLB TAEKWONDO - ĐÀO TẠO VÕ THUẬT CHUYÊN NGHIỆP',
     logoUrl: ''
   });
   const [isUploading, setIsUploading] = useState(false);
@@ -509,6 +510,16 @@ export default function AdminPanel() {
                       </div>
                     </div>
                     <div className="space-y-6">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Tiêu đề trang web (Browser Tab)</label>
+                        <input 
+                          required
+                          className="w-full bg-white/5 border border-white/10 px-5 py-4 rounded-sm text-white outline-none focus:border-primary transition-all"
+                          value={settings.siteTitle}
+                          onChange={e => setSettings({...settings, siteTitle: e.target.value})}
+                          placeholder="VD: CLB TAEKWONDO - ĐÀO TẠO VÕ THUẬT"
+                        />
+                      </div>
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Email liên hệ</label>
                         <input 

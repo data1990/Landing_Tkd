@@ -42,9 +42,19 @@ export default function App() {
       setTrainers(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
 
+    const unsubSettings = onSnapshot(doc(db, 'settings', 'contact'), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.siteTitle) {
+          document.title = data.siteTitle;
+        }
+      }
+    });
+
     return () => {
       unsubscribeAuth();
       unsubscribeTrainers();
+      unsubSettings();
     };
   }, []);
 
