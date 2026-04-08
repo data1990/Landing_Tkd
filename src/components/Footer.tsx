@@ -27,9 +27,13 @@ export default function Footer() {
         <div className="grid lg:grid-cols-12 gap-16 mb-24">
           <div className="lg:col-span-5">
             <div className="flex items-center gap-3 mb-10">
-              <div className="w-12 h-12 bg-primary skew-x-negative flex items-center justify-center text-white font-black text-2xl italic">
-                <span className="skew-x-[12deg]">T</span>
-              </div>
+              {settings.logoUrl ? (
+                <img src={settings.logoUrl} alt="Club Logo" className="h-12 w-auto object-contain" />
+              ) : (
+                <div className="w-12 h-12 bg-primary skew-x-negative flex items-center justify-center text-white font-black text-2xl italic">
+                  <span className="skew-x-[12deg]">T</span>
+                </div>
+              )}
               <span className="font-display font-black text-3xl tracking-tighter text-white uppercase italic">
                 CLB <span className="text-primary">TAEKWONDO</span>
               </span>

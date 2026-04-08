@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { collection, onSnapshot, query, orderBy, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { db, handleFirestoreError, OperationType, storage } from '../lib/firebase';
+import { collection, onSnapshot, query, orderBy, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { motion } from 'framer-motion';
-import { Plus, Trash2, Edit2, Users, BookOpen, Save, X, ShieldCheck, Settings } from 'lucide-react';
-import { setDoc } from 'firebase/firestore';
+import { Plus, Trash2, Edit2, Users, BookOpen, Save, X, ShieldCheck, Settings, Upload, Loader2 } from 'lucide-react';
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<'classes' | 'registrations' | 'trainers' | 'settings'>('classes');
@@ -13,8 +13,10 @@ export default function AdminPanel() {
   const [settings, setSettings] = useState({
     address: '123 Đường Võ Thuật, Quận 1, TP. HCM',
     phone: '090 123 4567',
-    email: 'contact@taekwondoclub.vn'
+    email: 'contact@taekwondoclub.vn',
+    logoUrl: ''
   });
+  const [isUploading, setIsUploading] = useState(false);
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: '',
@@ -66,6 +68,36 @@ export default function AdminPanel() {
       alert('Đã cập nhật thông tin liên hệ thành công!');
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, 'settings/contact');
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file size (limit to 500KB for Firestore)
+    if (file.size > 512 * 1024) {
+      alert('Tệp quá lớn! Vui lòng chọn ảnh dưới 500KB để đảm bảo hiệu suất.');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setSettings(prev => ({ ...prev, logoUrl: base64String }));
+        setIsUploading(false);
+        alert('Đã xử lý logo thành công! Hãy nhấn "LƯU CẤU HÌNH" để áp dụng thay đổi.');
+      };
+      reader.onerror = () => {
+        throw new Error('Lỗi khi đọc tệp.');
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Error processing logo:', err);
+      alert('Lỗi khi xử lý logo. Vui lòng thử lại.');
+      setIsUploading(false);
     }
   };
 
@@ -413,6 +445,48 @@ export default function AdminPanel() {
                 <form onSubmit={handleSaveSettings} className="space-y-8">
                   <div className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-6">
+                      <div className="space-y-4">
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Logo Câu lạc bộ</label>
+                        <div className="flex items-center gap-6">
+                          <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-sm flex items-center justify-center overflow-hidden relative group">
+                            {settings.logoUrl ? (
+                              <img src={settings.logoUrl} alt="Club Logo" className="w-full h-full object-contain" />
+                            ) : (
+                              <div className="w-12 h-12 bg-primary skew-x-negative flex items-center justify-center text-white font-black text-2xl italic">
+                                <span className="skew-x-[12deg]">T</span>
+                              </div>
+                            )}
+                            {isUploading && (
+                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                <Loader2 className="text-primary animate-spin" size={24} />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-grow space-y-3">
+                            <label className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-sm font-black text-[10px] uppercase tracking-widest cursor-pointer hover:bg-white/10 transition-all">
+                              <Upload size={14} className="text-primary" />
+                              {isUploading ? 'Đang xử lý...' : 'Tải lên Logo mới'}
+                              <input 
+                                type="file" 
+                                className="hidden" 
+                                accept="image/*"
+                                onChange={handleLogoUpload}
+                                disabled={isUploading}
+                              />
+                            </label>
+                            <div className="relative">
+                              <input 
+                                type="text"
+                                value={settings.logoUrl}
+                                onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
+                                placeholder="Hoặc dán URL logo tại đây..."
+                                className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 text-sm focus:border-primary outline-none transition-all placeholder:text-white/20"
+                              />
+                            </div>
+                            <p className="text-[10px] text-white/30 italic">Khuyên dùng ảnh PNG hoặc SVG nền trong suốt dưới 500KB.</p>
+                          </div>
+                        </div>
+                      </div>
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Địa chỉ CLB</label>
                         <input 

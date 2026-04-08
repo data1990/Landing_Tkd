@@ -1,7 +1,9 @@
+import React, { useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogIn, LogOut, LayoutDashboard, Home, Menu, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { db } from '../lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 import Magnetic from './Magnetic';
 
 interface NavbarProps {
@@ -16,13 +18,24 @@ interface NavbarProps {
 export default function Navbar({ user, isAdmin, onSignIn, onLogout, onToggleView, currentView }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    const unsubSettings = onSnapshot(doc(db, 'settings', 'contact'), (snap) => {
+      if (snap.exists()) {
+        setLogoUrl(snap.data().logoUrl || null);
+      }
+    });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      unsubSettings();
+    };
   }, []);
 
   return (
@@ -31,9 +44,13 @@ export default function Navbar({ user, isAdmin, onSignIn, onLogout, onToggleView
         <div className="flex items-center justify-between h-20">
           <Magnetic>
             <div className="flex items-center gap-3 cursor-pointer">
-              <div className="w-12 h-12 bg-primary skew-x-negative flex items-center justify-center text-white font-black text-2xl italic shadow-lg shadow-primary/20">
-                <span className="skew-x-[12deg]">T</span>
-              </div>
+              {logoUrl ? (
+                <img src={logoUrl} alt="Club Logo" className="h-12 w-auto object-contain" />
+              ) : (
+                <div className="w-12 h-12 bg-primary skew-x-negative flex items-center justify-center text-white font-black text-2xl italic shadow-lg shadow-primary/20">
+                  <span className="skew-x-[12deg]">T</span>
+                </div>
+              )}
               <span className="font-display font-black text-2xl tracking-tighter text-white uppercase italic">
                 CLB <span className="text-primary">TAEKWONDO</span>
               </span>
